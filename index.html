@@ -1,23 +1,71 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>My FPL Advisor</title>
+<html><head><meta charset="utf-8"><title>Razwan's Team</title>
 <style>
-body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 16px; color: #222; }
-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #ddd; }
-h1 { font-size: 22px; } h2 { font-size: 18px; margin-top: 32px; }
-.meta { color: #777; font-size: 13px; }
-li { margin-bottom: 8px; }
+:root { color-scheme: dark; }
+body { font-family: -apple-system, Segoe UI, sans-serif; max-width: 900px; margin: 0 auto;
+        padding: 24px 16px 60px; background: #0f1115; color: #e6e6e6; }
+h1 { font-size: 24px; margin-bottom: 4px; }
+h2 { font-size: 17px; margin: 36px 0 12px; border-left: 4px solid #4caf50; padding-left: 10px; }
+.meta { color: #8a8a8a; font-size: 13px; }
+.stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+.stat-card { background: #1a1d24; border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 130px; }
+.stat-card .label { font-size: 12px; color: #8a8a8a; }
+.stat-card .value { font-size: 20px; font-weight: 600; margin-top: 4px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #262a33; font-size: 14px; }
+th { color: #8a8a8a; font-weight: 500; font-size: 12px; text-transform: uppercase; }
+.fdr-chip { display: inline-block; color: white; font-size: 11px; padding: 2px 6px;
+             border-radius: 4px; margin-right: 4px; }
+.captain-box { background: #1a1d24; border-radius: 10px; padding: 16px; display: flex; gap: 24px; }
+.captain-box div { flex: 1; }
+.captain-box .tag { font-size: 12px; color: #8a8a8a; }
+.captain-box .name { font-size: 18px; font-weight: 600; }
+ul { padding-left: 0; list-style: none; }
+li { background: #1a1d24; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; font-size: 14px; }
+.out { color: #e2622a; font-weight: 600; }
+.in { color: #4caf50; font-weight: 600; }
+.gw-bar { display: grid; grid-template-columns: 50px 1fr 90px; align-items: center; gap: 10px;
+           margin-bottom: 6px; font-size: 13px; }
+.bar-track { background: #262a33; border-radius: 4px; height: 10px; overflow: hidden; }
+.bar-fill { height: 100%; }
+.callout { background: #16261b; border: 1px solid #244; border-radius: 8px; padding: 12px 14px;
+            font-size: 14px; margin-top: 10px; }
 </style></head><body>
-<h1>Your FPL squad — gameweek 4</h1>
-<p class="meta">Updated 2026-09-13 14:06 UTC. Bank: £0.5m.</p>
 
-<h2>Suggested transfers this week</h2>
-<ul><li><b>Sell Dubravka</b> — poor recent form. <b>Buy Kinsky</b> (£4.5m) — form 4.0, fixtures: AVL(H), MUN(A), COV(H).</li></ul>
+<h1>Razwan's Team</h1>
+<p class="meta">Gameweek 4 · Updated 2026-09-13 14:21 UTC</p>
 
-<h2>Full squad, sorted worst to best</h2>
-<table><tr><th>Player</th><th>Pos</th><th>Form</th><th>Avg FDR (next 3)</th><th>Fixtures</th><th>Score</th></tr>
-<tr><td>Dubravka</td><td>GKP</td><td>0.0</td><td>3.0</td><td>AVL(H), MUN(A), COV(H)</td><td>1.2</td></tr><tr><td>Gonzalo</td><td>FWD</td><td>3.0</td><td>2.7</td><td>MUN(H), IPS(A), HUL(H)</td><td>6.2</td></tr><tr><td>Konsa</td><td>DEF</td><td>2.8</td><td>2.7</td><td>BHA(A), LEE(H), NFO(A)</td><td>6.24</td></tr><tr><td>Mitchell</td><td>DEF</td><td>4.2</td><td>3.0</td><td>LEE(A), NFO(H), BHA(A)</td><td>7.92</td></tr><tr><td>Szoboszlai</td><td>MID</td><td>4.5</td><td>3.3</td><td>BOU(A), MCI(H), BRE(A)</td><td>8.2</td></tr><tr><td>Hall</td><td>DEF</td><td>4.5</td><td>2.3</td><td>HUL(H), COV(A), AVL(H)</td><td>9.4</td></tr><tr><td>Groß</td><td>MID</td><td>5.5</td><td>3.3</td><td>ARS(H), SUN(A), CRY(H)</td><td>9.8</td></tr><tr><td>Egan</td><td>DEF</td><td>6.2</td><td>3.0</td><td>NEW(A), EVE(H), FUL(A)</td><td>11.12</td></tr><tr><td>Palmer</td><td>MID</td><td>6.5</td><td>3.0</td><td>BRE(A), BOU(H), EVE(A)</td><td>11.6</td></tr><tr><td>Haaland</td><td>FWD</td><td>6.0</td><td>2.7</td><td>SUN(H), LIV(A), IPS(H)</td><td>11.8</td></tr><tr><td>Rogers</td><td>MID</td><td>6.8</td><td>3.0</td><td>BRE(A), BOU(H), EVE(A)</td><td>12.08</td></tr><tr><td>Gakpo</td><td>MID</td><td>7.2</td><td>3.3</td><td>BOU(A), MCI(H), BRE(A)</td><td>12.52</td></tr><tr><td>Calafiori</td><td>DEF</td><td>7.0</td><td>2.7</td><td>BHA(A), LEE(H), NFO(A)</td><td>12.6</td></tr><tr><td>Raya</td><td>GKP</td><td>7.2</td><td>2.7</td><td>BHA(A), LEE(H), NFO(A)</td><td>12.92</td></tr><tr><td>João Pedro</td><td>FWD</td><td>8.2</td><td>3.0</td><td>BRE(A), BOU(H), EVE(A)</td><td>14.32</td></tr></table>
+<div class="stat-row">
+  <div class="stat-card"><div class="label">Overall rank</div><div class="value">369,832</div></div>
+  <div class="stat-card"><div class="label">Total points</div><div class="value">289</div></div>
+  <div class="stat-card"><div class="label">Team value</div><div class="value">£100.9m</div></div>
+  <div class="stat-card"><div class="label">Bank</div><div class="value">£0.5m</div></div>
+</div>
+
+<h2>Captain pick this week</h2>
+<div class="captain-box">
+  <div><div class="tag">Captain</div><div class="name">João Pedro</div></div>
+  <div><div class="tag">Vice-captain</div><div class="name">Raya</div></div>
+</div>
+
+<h2>Suggested transfers</h2>
+<ul><li><span class="out">OUT Dubravka</span> — poor recent form<br><span class="in">IN Verbruggen</span> (£4.5m, form 4.5) <span class="fdr-chip" style="background:#e2622a">ARS H</span><span class="fdr-chip" style="background:#e0a800">SUN A</span><span class="fdr-chip" style="background:#e0a800">CRY H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span><span class="fdr-chip" style="background:#c0392b">MCI A</span></li></ul>
+
+<h2>Full squad — fixtures &amp; scores</h2>
+<table><tr><th>Player</th><th>Pos</th><th>Price</th><th>Form</th><th>Next 5</th><th>Score</th></tr>
+<tr><td>Dubravka</td><td>GKP</td><td>£4.0m</td><td>0.0</td><td><span class="fdr-chip" style="background:#e0a800">AVL H</span><span class="fdr-chip" style="background:#e2622a">MUN A</span><span class="fdr-chip" style="background:#4caf50">COV H</span><span class="fdr-chip" style="background:#e2622a">CHE A</span><span class="fdr-chip" style="background:#e0a800">CRY H</span></td><td><b>1.2</b></td></tr><tr><td>Gonzalo</td><td>FWD</td><td>£6.0m</td><td>3.0</td><td><span class="fdr-chip" style="background:#e2622a">MUN H</span><span class="fdr-chip" style="background:#4caf50">IPS A</span><span class="fdr-chip" style="background:#4caf50">HUL H</span><span class="fdr-chip" style="background:#4caf50">COV A</span><span class="fdr-chip" style="background:#e2622a">AVL A</span></td><td><b>6.2</b></td></tr><tr><td>Konsa</td><td>DEF</td><td>£4.5m</td><td>2.8</td><td><span class="fdr-chip" style="background:#e0a800">BHA A</span><span class="fdr-chip" style="background:#4caf50">LEE H</span><span class="fdr-chip" style="background:#e0a800">NFO A</span><span class="fdr-chip" style="background:#e0a800">EVE H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span></td><td><b>6.24</b></td></tr><tr><td>Mitchell</td><td>DEF</td><td>£4.5m</td><td>4.2</td><td><span class="fdr-chip" style="background:#e0a800">LEE A</span><span class="fdr-chip" style="background:#e0a800">NFO H</span><span class="fdr-chip" style="background:#e0a800">BHA A</span><span class="fdr-chip" style="background:#4caf50">NEW H</span><span class="fdr-chip" style="background:#e0a800">TOT A</span></td><td><b>7.92</b></td></tr><tr><td>Szoboszlai</td><td>MID</td><td>£7.0m</td><td>4.5</td><td><span class="fdr-chip" style="background:#e0a800">BOU A</span><span class="fdr-chip" style="background:#e2622a">MCI H</span><span class="fdr-chip" style="background:#e0a800">BRE A</span><span class="fdr-chip" style="background:#4caf50">BHA H</span><span class="fdr-chip" style="background:#e2622a">ARS H</span></td><td><b>8.2</b></td></tr><tr><td>Hall</td><td>DEF</td><td>£5.2m</td><td>4.5</td><td><span class="fdr-chip" style="background:#4caf50">HUL H</span><span class="fdr-chip" style="background:#4caf50">COV A</span><span class="fdr-chip" style="background:#e0a800">AVL H</span><span class="fdr-chip" style="background:#e0a800">CRY A</span><span class="fdr-chip" style="background:#e0a800">EVE H</span></td><td><b>9.4</b></td></tr><tr><td>Groß</td><td>MID</td><td>£5.6m</td><td>5.5</td><td><span class="fdr-chip" style="background:#e2622a">ARS H</span><span class="fdr-chip" style="background:#e0a800">SUN A</span><span class="fdr-chip" style="background:#e0a800">CRY H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span><span class="fdr-chip" style="background:#c0392b">MCI A</span></td><td><b>9.8</b></td></tr><tr><td>Egan</td><td>DEF</td><td>£4.1m</td><td>6.2</td><td><span class="fdr-chip" style="background:#e0a800">NEW A</span><span class="fdr-chip" style="background:#e0a800">EVE H</span><span class="fdr-chip" style="background:#e0a800">FUL A</span><span class="fdr-chip" style="background:#e0a800">BRE H</span><span class="fdr-chip" style="background:#4caf50">IPS H</span></td><td><b>11.12</b></td></tr><tr><td>Palmer</td><td>MID</td><td>£9.7m</td><td>6.5</td><td><span class="fdr-chip" style="background:#e0a800">BRE A</span><span class="fdr-chip" style="background:#e0a800">BOU H</span><span class="fdr-chip" style="background:#e0a800">EVE A</span><span class="fdr-chip" style="background:#e0a800">TOT H</span><span class="fdr-chip" style="background:#e2622a">MUN H</span></td><td><b>11.6</b></td></tr><tr><td>Haaland</td><td>FWD</td><td>£15.5m</td><td>6.0</td><td><span class="fdr-chip" style="background:#4caf50">SUN H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span><span class="fdr-chip" style="background:#4caf50">IPS H</span><span class="fdr-chip" style="background:#e2622a">AVL A</span><span class="fdr-chip" style="background:#4caf50">BHA H</span></td><td><b>11.8</b></td></tr><tr><td>Rogers</td><td>MID</td><td>£7.7m</td><td>6.8</td><td><span class="fdr-chip" style="background:#e0a800">BRE A</span><span class="fdr-chip" style="background:#e0a800">BOU H</span><span class="fdr-chip" style="background:#e0a800">EVE A</span><span class="fdr-chip" style="background:#e0a800">TOT H</span><span class="fdr-chip" style="background:#e2622a">MUN H</span></td><td><b>12.08</b></td></tr><tr><td>Gakpo</td><td>MID</td><td>£7.2m</td><td>7.2</td><td><span class="fdr-chip" style="background:#e0a800">BOU A</span><span class="fdr-chip" style="background:#e2622a">MCI H</span><span class="fdr-chip" style="background:#e0a800">BRE A</span><span class="fdr-chip" style="background:#4caf50">BHA H</span><span class="fdr-chip" style="background:#e2622a">ARS H</span></td><td><b>12.52</b></td></tr><tr><td>Calafiori</td><td>DEF</td><td>£5.8m</td><td>7.0</td><td><span class="fdr-chip" style="background:#e0a800">BHA A</span><span class="fdr-chip" style="background:#4caf50">LEE H</span><span class="fdr-chip" style="background:#e0a800">NFO A</span><span class="fdr-chip" style="background:#e0a800">EVE H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span></td><td><b>12.6</b></td></tr><tr><td>Raya</td><td>GKP</td><td>£6.0m</td><td>7.2</td><td><span class="fdr-chip" style="background:#e0a800">BHA A</span><span class="fdr-chip" style="background:#4caf50">LEE H</span><span class="fdr-chip" style="background:#e0a800">NFO A</span><span class="fdr-chip" style="background:#e0a800">EVE H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span></td><td><b>12.92</b></td></tr><tr><td>João Pedro</td><td>FWD</td><td>£7.8m</td><td>8.2</td><td><span class="fdr-chip" style="background:#e0a800">BRE A</span><span class="fdr-chip" style="background:#e0a800">BOU H</span><span class="fdr-chip" style="background:#e0a800">EVE A</span><span class="fdr-chip" style="background:#e0a800">TOT H</span><span class="fdr-chip" style="background:#e2622a">MUN H</span></td><td><b>14.32</b></td></tr></table>
+
+<h2>Future path — chip timing</h2>
+<div><div class="gw-bar"><span>GW5</span><div class="bar-track"><div class="bar-fill" style="width:40%;background:#e0a800"></div></div>3.0</div><div class="gw-bar"><span>GW6</span><div class="bar-track"><div class="bar-fill" style="width:41%;background:#e0a800"></div></div>2.933333333333333</div><div class="gw-bar"><span>GW7</span><div class="bar-track"><div class="bar-fill" style="width:44%;background:#e0a800"></div></div>2.8</div><div class="gw-bar"><span>GW8</span><div class="bar-track"><div class="bar-fill" style="width:41%;background:#e0a800"></div></div>2.933333333333333</div><div class="gw-bar"><span>GW9</span><div class="bar-track"><div class="bar-fill" style="width:28%;background:#c0392b"></div></div>3.6</div><div class="gw-bar"><span>GW10</span><div class="bar-track"><div class="bar-fill" style="width:41%;background:#e0a800"></div></div>2.933333333333333</div></div>
+<div class="callout">
+Best window: <b>GW7</b> — squad's easiest average fixtures. Good spot to consider Bench Boost or Triple Captain.<br>
+Watch out: <b>GW9</b> — toughest run or blanks piling up. Worth planning a Wildcard or Free Hit around here.
+</div>
+
+<h2>Differentials to watch</h2>
+<ul><li>Schade (MID, 4.4% owned) — score 12.6</li><li>Tavernier (MID, 4.2% owned) — score 12.52</li><li>Scott (MID, 5.9% owned) — score 12.2</li><li>Belloumi (MID, 1.8% owned) — score 12.08</li><li>Maitland-Niles (DEF, 0.4% owned) — score 11.8</li></ul>
 
 <h2>Chips used</h2>
-<ul><li>wildcard — used gameweek 3</li></ul>
+<ul><li>wildcard — gameweek 3</li></ul>
+
 </body></html>
