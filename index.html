@@ -1,71 +1,108 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Razwan's Team</title>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Razwan's Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root { color-scheme: dark; }
-body { font-family: -apple-system, Segoe UI, sans-serif; max-width: 900px; margin: 0 auto;
-        padding: 24px 16px 60px; background: #0f1115; color: #e6e6e6; }
-h1 { font-size: 24px; margin-bottom: 4px; }
-h2 { font-size: 17px; margin: 36px 0 12px; border-left: 4px solid #4caf50; padding-left: 10px; }
-.meta { color: #8a8a8a; font-size: 13px; }
-.stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
-.stat-card { background: #1a1d24; border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 130px; }
-.stat-card .label { font-size: 12px; color: #8a8a8a; }
-.stat-card .value { font-size: 20px; font-weight: 600; margin-top: 4px; }
+:root {
+  --ink: #0b1710; --turf: #16301f; --turf-2: #1d3d27; --line: #2f5138;
+  --chalk: #f2efe4; --dim: #9db3a2; --floodlight: #f4b942; --brick: #d1585a;
+}
+* { box-sizing: border-box; }
+body { font-family: 'Inter', -apple-system, sans-serif; max-width: 880px; margin: 0 auto;
+        padding: 20px 16px 70px; background: var(--ink); color: var(--chalk); }
+h1 { font-family: 'Oswald', sans-serif; font-weight: 600; letter-spacing: 0.3px; margin: 0; font-size: 30px; }
+.dim { color: var(--dim); }
+.num { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+.hero { position: relative; overflow: hidden; background: linear-gradient(160deg, var(--turf) 0%, var(--turf-2) 100%);
+         border: 1px solid var(--line); border-radius: 16px; padding: 26px 96px 26px 26px; margin-top: 10px; }
+.hero::after { content: ""; position: absolute; top: -60px; right: -60px; width: 180px; height: 180px;
+                border-radius: 50%; border: 2px solid rgba(242,239,228,0.08); }
+.hero .updated { font-size: 13px; margin-top: 6px; }
+.gw-badge { position: absolute; top: 22px; right: 22px; width: 58px; height: 58px; border-radius: 50%;
+             border: 3px solid var(--floodlight); display: flex; align-items: center; justify-content: center;
+             font-family: 'Oswald', sans-serif; font-size: 19px; font-weight: 700; color: var(--floodlight); }
+
+.ticker { display: flex; background: var(--ink); border: 1px solid var(--line); border-radius: 10px;
+           overflow: hidden; margin-top: 18px; flex-wrap: wrap; }
+.ticker .seg { flex: 1; min-width: 110px; padding: 12px 16px; border-right: 1px solid var(--line); }
+.ticker .seg:last-child { border-right: none; }
+.seg .val { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 600; color: var(--floodlight); }
+.seg .lbl { font-size: 12px; color: var(--dim); margin-top: 2px; }
+
+.divider { display: flex; align-items: center; gap: 12px; margin: 38px 0 16px; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px;
+    background-image: linear-gradient(to right, var(--line) 60%, transparent 40%); background-size: 9px 1px; }
+.divider span { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 500; color: var(--dim); white-space: nowrap; }
+
+.captain-box { display: flex; gap: 14px; }
+.captain-box .card { flex: 1; background: var(--turf); border: 1px solid var(--line); border-radius: 12px;
+                       padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.armband { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 13px; background: var(--floodlight); color: var(--ink); flex-shrink: 0; }
+.armband.vc { background: var(--dim); }
+.captain-box .name { font-size: 16px; font-weight: 600; }
+
+.transfer-row { background: var(--turf); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+.transfer-head { font-family: 'Oswald', sans-serif; font-size: 16px; }
+.out-name { color: var(--brick); font-weight: 600; }
+.arrow { color: var(--dim); }
+.alt-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.alt-chip { background: var(--turf-2); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; font-size: 12.5px; flex: 1; min-width: 170px; }
+.alt-chip .name { font-weight: 600; margin-bottom: 3px; }
+
 table { width: 100%; border-collapse: collapse; }
-th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #262a33; font-size: 14px; }
-th { color: #8a8a8a; font-weight: 500; font-size: 12px; text-transform: uppercase; }
-.fdr-chip { display: inline-block; color: white; font-size: 11px; padding: 2px 6px;
-             border-radius: 4px; margin-right: 4px; }
-.captain-box { background: #1a1d24; border-radius: 10px; padding: 16px; display: flex; gap: 24px; }
-.captain-box div { flex: 1; }
-.captain-box .tag { font-size: 12px; color: #8a8a8a; }
-.captain-box .name { font-size: 18px; font-weight: 600; }
-ul { padding-left: 0; list-style: none; }
-li { background: #1a1d24; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; font-size: 14px; }
-.out { color: #e2622a; font-weight: 600; }
-.in { color: #4caf50; font-weight: 600; }
-.gw-bar { display: grid; grid-template-columns: 50px 1fr 90px; align-items: center; gap: 10px;
-           margin-bottom: 6px; font-size: 13px; }
-.bar-track { background: #262a33; border-radius: 4px; height: 10px; overflow: hidden; }
+th, td { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--line); font-size: 14px; }
+th { color: var(--dim); font-weight: 500; font-size: 12px; }
+.pos-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; }
+.fdr-chip { display: inline-block; color: var(--ink); font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; margin: 1px 3px 1px 0; }
+
+.gw-bar { display: grid; grid-template-columns: 44px 1fr 70px; align-items: center; gap: 10px; margin-bottom: 7px; font-size: 13px; }
+.bar-track { background: var(--turf-2); border-radius: 4px; height: 9px; overflow: hidden; }
 .bar-fill { height: 100%; }
-.callout { background: #16261b; border: 1px solid #244; border-radius: 8px; padding: 12px 14px;
-            font-size: 14px; margin-top: 10px; }
+.callout { background: var(--turf); border: 1px solid var(--line); border-radius: 10px; padding: 13px 15px; font-size: 14px; margin-top: 12px; }
+
+.chip-row, .diff-row { padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.chip-name { font-weight: 600; }
 </style></head><body>
 
-<h1>Razwan's Team</h1>
-<p class="meta">Gameweek 4 · Updated 2026-09-13 14:21 UTC</p>
-
-<div class="stat-row">
-  <div class="stat-card"><div class="label">Overall rank</div><div class="value">369,832</div></div>
-  <div class="stat-card"><div class="label">Total points</div><div class="value">289</div></div>
-  <div class="stat-card"><div class="label">Team value</div><div class="value">£100.9m</div></div>
-  <div class="stat-card"><div class="label">Bank</div><div class="value">£0.5m</div></div>
+<div class="hero">
+  <h1>Razwan's Team</h1>
+  <div class="dim updated">Gameweek 4. Last updated 2026-09-14 04:07 UTC. Deep-dive on 15 squad players plus shortlisted alternatives.</div>
+  <div class="gw-badge">GW4</div>
+  <div class="ticker">
+    <div class="seg"><div class="val">297,392</div><div class="lbl">Overall rank</div></div>
+    <div class="seg"><div class="val">309</div><div class="lbl">Total points</div></div>
+    <div class="seg"><div class="val">£100.9m</div><div class="lbl">Team value</div></div>
+    <div class="seg"><div class="val">£0.5m</div><div class="lbl">In the bank</div></div>
+  </div>
 </div>
 
-<h2>Captain pick this week</h2>
+<div class="divider"><span>Captaincy</span></div>
 <div class="captain-box">
-  <div><div class="tag">Captain</div><div class="name">João Pedro</div></div>
-  <div><div class="tag">Vice-captain</div><div class="name">Raya</div></div>
+  <div class="card"><div class="armband">C</div><div class="name">Haaland</div></div>
+  <div class="card"><div class="armband vc">VC</div><div class="name">João Pedro</div></div>
 </div>
 
-<h2>Suggested transfers</h2>
-<ul><li><span class="out">OUT Dubravka</span> — poor recent form<br><span class="in">IN Verbruggen</span> (£4.5m, form 4.5) <span class="fdr-chip" style="background:#e2622a">ARS H</span><span class="fdr-chip" style="background:#e0a800">SUN A</span><span class="fdr-chip" style="background:#e0a800">CRY H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span><span class="fdr-chip" style="background:#c0392b">MCI A</span></li></ul>
+<div class="divider"><span>Suggested transfers</span></div>
+<div class="transfer-row"><div class="transfer-head"><span class="out-name">Dubravka</span> <span class="arrow">&#8594;</span> <span class="dim">tough fixture run and shaky underlying numbers (score 0.72)</span></div><div class="alt-chips"><div class="alt-chip"><div class="name">Verbruggen</div><div class="dim">£4.5m · score 6.66 · xGI/90 0.05</div><div class="dim">price steady (£+0.0m this season), losing owners, 22.1% owned</div><div><span class="fdr-chip" style="background:#c76a3a">ARS H</span><span class="fdr-chip" style="background:#d9a634">SUN A</span><span class="fdr-chip" style="background:#d9a634">CRY H</span><span class="fdr-chip" style="background:#c76a3a">LIV A</span><span class="fdr-chip" style="background:#c1454a">MCI A</span></div></div><div class="alt-chip"><div class="name">Kinsky</div><div class="dim">£4.5m · score 6.4 · xGI/90 0.0</div><div class="dim">price steady (£+0.0m this season), gaining owners, 18.5% owned</div><div><span class="fdr-chip" style="background:#d9a634">AVL H</span><span class="fdr-chip" style="background:#c76a3a">MUN A</span><span class="fdr-chip" style="background:#5aa66a">COV H</span><span class="fdr-chip" style="background:#c76a3a">CHE A</span><span class="fdr-chip" style="background:#d9a634">CRY H</span></div></div><div class="alt-chip"><div class="name">Leno</div><div class="dim">£4.5m · score 6.34 · xGI/90 0.0</div><div class="dim">price steady (£+0.0m this season), gaining owners, 3.0% owned</div><div><span class="fdr-chip" style="background:#c76a3a">MUN H</span><span class="fdr-chip" style="background:#5aa66a">IPS A</span><span class="fdr-chip" style="background:#5aa66a">HUL H</span><span class="fdr-chip" style="background:#5aa66a">COV A</span><span class="fdr-chip" style="background:#c76a3a">AVL A</span></div></div><div class="alt-chip"><div class="name">Petrović</div><div class="dim">£4.5m · score 3.34 · xGI/90 0.0</div><div class="dim">price steady (£+0.0m this season), losing owners, 3.2% owned</div><div><span class="fdr-chip" style="background:#c76a3a">LIV H</span><span class="fdr-chip" style="background:#c76a3a">CHE A</span><span class="fdr-chip" style="background:#5aa66a">SUN H</span><span class="fdr-chip" style="background:#c76a3a">MUN A</span><span class="fdr-chip" style="background:#5aa66a">LEE H</span></div></div></div></div>
 
-<h2>Full squad — fixtures &amp; scores</h2>
-<table><tr><th>Player</th><th>Pos</th><th>Price</th><th>Form</th><th>Next 5</th><th>Score</th></tr>
-<tr><td>Dubravka</td><td>GKP</td><td>£4.0m</td><td>0.0</td><td><span class="fdr-chip" style="background:#e0a800">AVL H</span><span class="fdr-chip" style="background:#e2622a">MUN A</span><span class="fdr-chip" style="background:#4caf50">COV H</span><span class="fdr-chip" style="background:#e2622a">CHE A</span><span class="fdr-chip" style="background:#e0a800">CRY H</span></td><td><b>1.2</b></td></tr><tr><td>Gonzalo</td><td>FWD</td><td>£6.0m</td><td>3.0</td><td><span class="fdr-chip" style="background:#e2622a">MUN H</span><span class="fdr-chip" style="background:#4caf50">IPS A</span><span class="fdr-chip" style="background:#4caf50">HUL H</span><span class="fdr-chip" style="background:#4caf50">COV A</span><span class="fdr-chip" style="background:#e2622a">AVL A</span></td><td><b>6.2</b></td></tr><tr><td>Konsa</td><td>DEF</td><td>£4.5m</td><td>2.8</td><td><span class="fdr-chip" style="background:#e0a800">BHA A</span><span class="fdr-chip" style="background:#4caf50">LEE H</span><span class="fdr-chip" style="background:#e0a800">NFO A</span><span class="fdr-chip" style="background:#e0a800">EVE H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span></td><td><b>6.24</b></td></tr><tr><td>Mitchell</td><td>DEF</td><td>£4.5m</td><td>4.2</td><td><span class="fdr-chip" style="background:#e0a800">LEE A</span><span class="fdr-chip" style="background:#e0a800">NFO H</span><span class="fdr-chip" style="background:#e0a800">BHA A</span><span class="fdr-chip" style="background:#4caf50">NEW H</span><span class="fdr-chip" style="background:#e0a800">TOT A</span></td><td><b>7.92</b></td></tr><tr><td>Szoboszlai</td><td>MID</td><td>£7.0m</td><td>4.5</td><td><span class="fdr-chip" style="background:#e0a800">BOU A</span><span class="fdr-chip" style="background:#e2622a">MCI H</span><span class="fdr-chip" style="background:#e0a800">BRE A</span><span class="fdr-chip" style="background:#4caf50">BHA H</span><span class="fdr-chip" style="background:#e2622a">ARS H</span></td><td><b>8.2</b></td></tr><tr><td>Hall</td><td>DEF</td><td>£5.2m</td><td>4.5</td><td><span class="fdr-chip" style="background:#4caf50">HUL H</span><span class="fdr-chip" style="background:#4caf50">COV A</span><span class="fdr-chip" style="background:#e0a800">AVL H</span><span class="fdr-chip" style="background:#e0a800">CRY A</span><span class="fdr-chip" style="background:#e0a800">EVE H</span></td><td><b>9.4</b></td></tr><tr><td>Groß</td><td>MID</td><td>£5.6m</td><td>5.5</td><td><span class="fdr-chip" style="background:#e2622a">ARS H</span><span class="fdr-chip" style="background:#e0a800">SUN A</span><span class="fdr-chip" style="background:#e0a800">CRY H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span><span class="fdr-chip" style="background:#c0392b">MCI A</span></td><td><b>9.8</b></td></tr><tr><td>Egan</td><td>DEF</td><td>£4.1m</td><td>6.2</td><td><span class="fdr-chip" style="background:#e0a800">NEW A</span><span class="fdr-chip" style="background:#e0a800">EVE H</span><span class="fdr-chip" style="background:#e0a800">FUL A</span><span class="fdr-chip" style="background:#e0a800">BRE H</span><span class="fdr-chip" style="background:#4caf50">IPS H</span></td><td><b>11.12</b></td></tr><tr><td>Palmer</td><td>MID</td><td>£9.7m</td><td>6.5</td><td><span class="fdr-chip" style="background:#e0a800">BRE A</span><span class="fdr-chip" style="background:#e0a800">BOU H</span><span class="fdr-chip" style="background:#e0a800">EVE A</span><span class="fdr-chip" style="background:#e0a800">TOT H</span><span class="fdr-chip" style="background:#e2622a">MUN H</span></td><td><b>11.6</b></td></tr><tr><td>Haaland</td><td>FWD</td><td>£15.5m</td><td>6.0</td><td><span class="fdr-chip" style="background:#4caf50">SUN H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span><span class="fdr-chip" style="background:#4caf50">IPS H</span><span class="fdr-chip" style="background:#e2622a">AVL A</span><span class="fdr-chip" style="background:#4caf50">BHA H</span></td><td><b>11.8</b></td></tr><tr><td>Rogers</td><td>MID</td><td>£7.7m</td><td>6.8</td><td><span class="fdr-chip" style="background:#e0a800">BRE A</span><span class="fdr-chip" style="background:#e0a800">BOU H</span><span class="fdr-chip" style="background:#e0a800">EVE A</span><span class="fdr-chip" style="background:#e0a800">TOT H</span><span class="fdr-chip" style="background:#e2622a">MUN H</span></td><td><b>12.08</b></td></tr><tr><td>Gakpo</td><td>MID</td><td>£7.2m</td><td>7.2</td><td><span class="fdr-chip" style="background:#e0a800">BOU A</span><span class="fdr-chip" style="background:#e2622a">MCI H</span><span class="fdr-chip" style="background:#e0a800">BRE A</span><span class="fdr-chip" style="background:#4caf50">BHA H</span><span class="fdr-chip" style="background:#e2622a">ARS H</span></td><td><b>12.52</b></td></tr><tr><td>Calafiori</td><td>DEF</td><td>£5.8m</td><td>7.0</td><td><span class="fdr-chip" style="background:#e0a800">BHA A</span><span class="fdr-chip" style="background:#4caf50">LEE H</span><span class="fdr-chip" style="background:#e0a800">NFO A</span><span class="fdr-chip" style="background:#e0a800">EVE H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span></td><td><b>12.6</b></td></tr><tr><td>Raya</td><td>GKP</td><td>£6.0m</td><td>7.2</td><td><span class="fdr-chip" style="background:#e0a800">BHA A</span><span class="fdr-chip" style="background:#4caf50">LEE H</span><span class="fdr-chip" style="background:#e0a800">NFO A</span><span class="fdr-chip" style="background:#e0a800">EVE H</span><span class="fdr-chip" style="background:#e2622a">LIV A</span></td><td><b>12.92</b></td></tr><tr><td>João Pedro</td><td>FWD</td><td>£7.8m</td><td>8.2</td><td><span class="fdr-chip" style="background:#e0a800">BRE A</span><span class="fdr-chip" style="background:#e0a800">BOU H</span><span class="fdr-chip" style="background:#e0a800">EVE A</span><span class="fdr-chip" style="background:#e0a800">TOT H</span><span class="fdr-chip" style="background:#e2622a">MUN H</span></td><td><b>14.32</b></td></tr></table>
+<div class="divider"><span>Squad sheet</span></div>
+<table><tr><th>Player</th><th>Pos</th><th>Price</th><th>Form</th><th>Underlying (last 4)</th><th>Next 5</th><th>Score</th></tr>
+<tr><td><span class="pos-dot" style="background:#d9a634"></span>Dubravka</td><td>GKP</td><td>£4.0m</td><td>0.0</td><td class="dim">xGI/90 0 · 0 min avg</td><td><span class="fdr-chip" style="background:#d9a634">AVL H</span><span class="fdr-chip" style="background:#c76a3a">MUN A</span><span class="fdr-chip" style="background:#5aa66a">COV H</span><span class="fdr-chip" style="background:#c76a3a">CHE A</span><span class="fdr-chip" style="background:#d9a634">CRY H</span></td><td class="num">0.72</td></tr><tr><td><span class="pos-dot" style="background:#6fb8d1"></span>Konsa</td><td>DEF</td><td>£4.5m</td><td>2.8</td><td class="dim">xGI/90 0.0 · 48 min avg</td><td><span class="fdr-chip" style="background:#d9a634">BHA A</span><span class="fdr-chip" style="background:#5aa66a">LEE H</span><span class="fdr-chip" style="background:#d9a634">NFO A</span><span class="fdr-chip" style="background:#d9a634">EVE H</span><span class="fdr-chip" style="background:#c76a3a">LIV A</span></td><td class="num">5.31</td></tr><tr><td><span class="pos-dot" style="background:#c1454a"></span>Gonzalo</td><td>FWD</td><td>£6.0m</td><td>3.0</td><td class="dim">xGI/90 0.49 · 86 min avg</td><td><span class="fdr-chip" style="background:#c76a3a">MUN H</span><span class="fdr-chip" style="background:#5aa66a">IPS A</span><span class="fdr-chip" style="background:#5aa66a">HUL H</span><span class="fdr-chip" style="background:#5aa66a">COV A</span><span class="fdr-chip" style="background:#c76a3a">AVL A</span></td><td class="num">7.26</td></tr><tr><td><span class="pos-dot" style="background:#6fb8d1"></span>Mitchell</td><td>DEF</td><td>£4.5m</td><td>4.2</td><td class="dim">xGI/90 0.28 · 82 min avg</td><td><span class="fdr-chip" style="background:#d9a634">LEE A</span><span class="fdr-chip" style="background:#d9a634">NFO H</span><span class="fdr-chip" style="background:#d9a634">BHA A</span><span class="fdr-chip" style="background:#5aa66a">NEW H</span><span class="fdr-chip" style="background:#d9a634">TOT A</span></td><td class="num">7.78</td></tr><tr><td><span class="pos-dot" style="background:#6fb8d1"></span>Hall</td><td>DEF</td><td>£5.2m</td><td>4.5</td><td class="dim">xGI/90 0.24 · 67 min avg</td><td><span class="fdr-chip" style="background:#5aa66a">HUL H</span><span class="fdr-chip" style="background:#5aa66a">COV A</span><span class="fdr-chip" style="background:#d9a634">AVL H</span><span class="fdr-chip" style="background:#d9a634">CRY A</span><span class="fdr-chip" style="background:#d9a634">EVE H</span></td><td class="num">8.86</td></tr><tr><td><span class="pos-dot" style="background:#c9c15a"></span>Szoboszlai</td><td>MID</td><td>£7.0m</td><td>4.5</td><td class="dim">xGI/90 0.52 · 90 min avg</td><td><span class="fdr-chip" style="background:#d9a634">BOU A</span><span class="fdr-chip" style="background:#c76a3a">MCI H</span><span class="fdr-chip" style="background:#d9a634">BRE A</span><span class="fdr-chip" style="background:#5aa66a">BHA H</span><span class="fdr-chip" style="background:#c76a3a">ARS H</span></td><td class="num">8.93</td></tr><tr><td><span class="pos-dot" style="background:#6fb8d1"></span>Egan</td><td>DEF</td><td>£4.1m</td><td>6.2</td><td class="dim">xGI/90 0.01 · 90 min avg</td><td><span class="fdr-chip" style="background:#d9a634">NEW A</span><span class="fdr-chip" style="background:#d9a634">EVE H</span><span class="fdr-chip" style="background:#d9a634">FUL A</span><span class="fdr-chip" style="background:#d9a634">BRE H</span><span class="fdr-chip" style="background:#5aa66a">IPS H</span></td><td class="num">9.3</td></tr><tr><td><span class="pos-dot" style="background:#d9a634"></span>Raya</td><td>GKP</td><td>£6.0m</td><td>7.2</td><td class="dim">xGI/90 0.0 · 90 min avg</td><td><span class="fdr-chip" style="background:#d9a634">BHA A</span><span class="fdr-chip" style="background:#5aa66a">LEE H</span><span class="fdr-chip" style="background:#d9a634">NFO A</span><span class="fdr-chip" style="background:#d9a634">EVE H</span><span class="fdr-chip" style="background:#c76a3a">LIV A</span></td><td class="num">10.76</td></tr><tr><td><span class="pos-dot" style="background:#c9c15a"></span>Palmer</td><td>MID</td><td>£9.7m</td><td>6.5</td><td class="dim">xGI/90 0.46 · 88 min avg</td><td><span class="fdr-chip" style="background:#d9a634">BRE A</span><span class="fdr-chip" style="background:#d9a634">BOU H</span><span class="fdr-chip" style="background:#d9a634">EVE A</span><span class="fdr-chip" style="background:#d9a634">TOT H</span><span class="fdr-chip" style="background:#c76a3a">MUN H</span></td><td class="num">11.49</td></tr><tr><td><span class="pos-dot" style="background:#6fb8d1"></span>Calafiori</td><td>DEF</td><td>£5.8m</td><td>7.0</td><td class="dim">xGI/90 0.33 · 82 min avg</td><td><span class="fdr-chip" style="background:#d9a634">BHA A</span><span class="fdr-chip" style="background:#5aa66a">LEE H</span><span class="fdr-chip" style="background:#d9a634">NFO A</span><span class="fdr-chip" style="background:#d9a634">EVE H</span><span class="fdr-chip" style="background:#c76a3a">LIV A</span></td><td class="num">11.82</td></tr><tr><td><span class="pos-dot" style="background:#c9c15a"></span>Gakpo</td><td>MID</td><td>£7.2m</td><td>7.2</td><td class="dim">xGI/90 0.53 · 70 min avg</td><td><span class="fdr-chip" style="background:#d9a634">BOU A</span><span class="fdr-chip" style="background:#c76a3a">MCI H</span><span class="fdr-chip" style="background:#d9a634">BRE A</span><span class="fdr-chip" style="background:#5aa66a">BHA H</span><span class="fdr-chip" style="background:#c76a3a">ARS H</span></td><td class="num">12.48</td></tr><tr><td><span class="pos-dot" style="background:#c9c15a"></span>Rogers</td><td>MID</td><td>£7.7m</td><td>6.8</td><td class="dim">xGI/90 0.66 · 87 min avg</td><td><span class="fdr-chip" style="background:#d9a634">BRE A</span><span class="fdr-chip" style="background:#d9a634">BOU H</span><span class="fdr-chip" style="background:#d9a634">EVE A</span><span class="fdr-chip" style="background:#d9a634">TOT H</span><span class="fdr-chip" style="background:#c76a3a">MUN H</span></td><td class="num">12.68</td></tr><tr><td><span class="pos-dot" style="background:#c9c15a"></span>Groß</td><td>MID</td><td>£5.6m</td><td>8.2</td><td class="dim">xGI/90 0.57 · 90 min avg</td><td><span class="fdr-chip" style="background:#c76a3a">ARS H</span><span class="fdr-chip" style="background:#d9a634">SUN A</span><span class="fdr-chip" style="background:#d9a634">CRY H</span><span class="fdr-chip" style="background:#c76a3a">LIV A</span><span class="fdr-chip" style="background:#c1454a">MCI A</span></td><td class="num">13.94</td></tr><tr><td><span class="pos-dot" style="background:#c1454a"></span>João Pedro</td><td>FWD</td><td>£7.8m</td><td>8.2</td><td class="dim">xGI/90 0.59 · 90 min avg</td><td><span class="fdr-chip" style="background:#d9a634">BRE A</span><span class="fdr-chip" style="background:#d9a634">BOU H</span><span class="fdr-chip" style="background:#d9a634">EVE A</span><span class="fdr-chip" style="background:#d9a634">TOT H</span><span class="fdr-chip" style="background:#c76a3a">MUN H</span></td><td class="num">14.22</td></tr><tr><td><span class="pos-dot" style="background:#c1454a"></span>Haaland</td><td>FWD</td><td>£15.5m</td><td>8.2</td><td class="dim">xGI/90 0.96 · 90 min avg</td><td><span class="fdr-chip" style="background:#5aa66a">SUN H</span><span class="fdr-chip" style="background:#c76a3a">LIV A</span><span class="fdr-chip" style="background:#5aa66a">IPS H</span><span class="fdr-chip" style="background:#c76a3a">AVL A</span><span class="fdr-chip" style="background:#5aa66a">BHA H</span></td><td class="num">15.9</td></tr></table>
 
-<h2>Future path — chip timing</h2>
-<div><div class="gw-bar"><span>GW5</span><div class="bar-track"><div class="bar-fill" style="width:40%;background:#e0a800"></div></div>3.0</div><div class="gw-bar"><span>GW6</span><div class="bar-track"><div class="bar-fill" style="width:41%;background:#e0a800"></div></div>2.933333333333333</div><div class="gw-bar"><span>GW7</span><div class="bar-track"><div class="bar-fill" style="width:44%;background:#e0a800"></div></div>2.8</div><div class="gw-bar"><span>GW8</span><div class="bar-track"><div class="bar-fill" style="width:41%;background:#e0a800"></div></div>2.933333333333333</div><div class="gw-bar"><span>GW9</span><div class="bar-track"><div class="bar-fill" style="width:28%;background:#c0392b"></div></div>3.6</div><div class="gw-bar"><span>GW10</span><div class="bar-track"><div class="bar-fill" style="width:41%;background:#e0a800"></div></div>2.933333333333333</div></div>
+<div class="divider"><span>Fixture outlook</span></div>
+<div class="gw-bar"><span>GW5</span><div class="bar-track"><div class="bar-fill" style="width:40%;background:#d9a634"></div></div><span class="dim">3.0</span></div><div class="gw-bar"><span>GW6</span><div class="bar-track"><div class="bar-fill" style="width:41%;background:#d9a634"></div></div><span class="dim">2.9</span></div><div class="gw-bar"><span>GW7</span><div class="bar-track"><div class="bar-fill" style="width:44%;background:#d9a634"></div></div><span class="dim">2.8</span></div><div class="gw-bar"><span>GW8</span><div class="bar-track"><div class="bar-fill" style="width:41%;background:#d9a634"></div></div><span class="dim">2.9</span></div><div class="gw-bar"><span>GW9</span><div class="bar-track"><div class="bar-fill" style="width:28%;background:#c1454a"></div></div><span class="dim">3.6</span></div><div class="gw-bar"><span>GW10</span><div class="bar-track"><div class="bar-fill" style="width:41%;background:#d9a634"></div></div><span class="dim">2.9</span></div>
 <div class="callout">
-Best window: <b>GW7</b> — squad's easiest average fixtures. Good spot to consider Bench Boost or Triple Captain.<br>
-Watch out: <b>GW9</b> — toughest run or blanks piling up. Worth planning a Wildcard or Free Hit around here.
+Best window: GW7 — squad's easiest average fixtures. Good spot to consider Bench Boost or Triple Captain.<br>
+Watch out: GW9 — toughest run or blanks piling up. Worth planning a Wildcard or Free Hit around here.
 </div>
 
-<h2>Differentials to watch</h2>
-<ul><li>Schade (MID, 4.4% owned) — score 12.6</li><li>Tavernier (MID, 4.2% owned) — score 12.52</li><li>Scott (MID, 5.9% owned) — score 12.2</li><li>Belloumi (MID, 1.8% owned) — score 12.08</li><li>Maitland-Niles (DEF, 0.4% owned) — score 11.8</li></ul>
+<div class="divider"><span>Differentials to watch</span></div>
+<div class="diff-row"><span class="chip-name">Tavernier</span> <span class="dim">MID · 4.6% owned · score 12.96 · xGI/90 0.65 · 88 min avg · price rising (£+0.1m this season), gaining owners, 4.6% owned</span></div><div class="diff-row"><span class="chip-name">Schade</span> <span class="dim">MID · 4.9% owned · score 11.63 · xGI/90 0.32 · 89 min avg · price steady (£+0.0m this season), gaining owners, 4.9% owned</span></div><div class="diff-row"><span class="chip-name">Emersonn</span> <span class="dim">FWD · 2.3% owned · score 11.2 · xGI/90 0.6 · 59 min avg · price steady (£+0.0m this season), gaining owners, 2.3% owned</span></div><div class="diff-row"><span class="chip-name">Scott</span> <span class="dim">MID · 5.9% owned · score 10.98 · xGI/90 0.22 · 89 min avg · price steady (£+0.1m this season), gaining owners, 5.9% owned</span></div><div class="diff-row"><span class="chip-name">Belloumi</span> <span class="dim">MID · 2.2% owned · score 10.6 · xGI/90 0.14 · 78 min avg · price steady (£+0.0m this season), gaining owners, 2.2% owned</span></div>
 
-<h2>Chips used</h2>
-<ul><li>wildcard — gameweek 3</li></ul>
+<div class="divider"><span>Chips used</span></div>
+<div class="chip-row"><span class="chip-name">wildcard</span><span class="dim">gameweek 3</span></div>
 
 </body></html>
