@@ -141,42 +141,70 @@ def news_text(p):
     return ""
 
 
-def build_gw_plan(squad, gw_range, fmap_future, chip_names_used, best_gw, worst_gw):
-    """A week-by-week narrative: fixture read, captaincy lean, rotation watch, chip callouts."""
+def avg_fdr(games):
+    return sum(g["difficulty"] for g in games) / len(games) if games else 3
+
+
+def find_future_dip(p, fmap_future, lookahead):
+    """First future gameweek where a lookahead-window average difficulty jumps to >=4,
+    given the player's near-term run is currently comfortable (<3). Returns that gw or None."""
+    games_all = fmap_future.get(p["team"], [])
+    if len(games_all) < lookahead:
+        return None
+    current_avg = avg_fdr(games_all[:lookahead])
+    if current_avg >= 3.0:
+        return None  # already rough now — this is an immediate weak-link case, not a future dip
+    for start_idx in range(1, len(games_all) - lookahead + 1):
+        window = games_all[start_idx:start_idx + lookahead]
+        if avg_fdr(window) >= 4.0:
+            return window[0]["event"]
+    return None
+
+
+def compute_free_transfers(history_current, chip_events_by_gw):
+    """Simulate FPL's free-transfer banking (max 5) from season history, to know how many
+    free transfers are actually available going into the next gameweek."""
+    ft = 1
+    for gw_entry in history_current:
+        event = gw_entry["event"]
+        if event == 1:
+            continue
+        if chip_events_by_gw.get(event) in ("wildcard", "freehit"):
+            ft = min(5, ft + 1)
+            continue
+        made = gw_entry.get("event_transfers", 0)
+        ft = min(5, max(ft - made, 0) + 1)
+    return ft
+
+
+def build_transfer_plan(gw_range, transfer_events, gw_avg, best_gw, worst_gw, chip_names_used, starting_ft):
+    """A week-by-week plan: which gameweek gets which transfer, using how many free transfers,
+    and where chip windows fall — in chronological order."""
+    events_by_gw = {}
+    for ev in transfer_events:
+        events_by_gw.setdefault(ev["target_gw"], []).append(ev)
+
     plan = []
+    ft = starting_ft
     for gw in gw_range:
-        games = []
-        for p in squad:
-            g = next((x for x in fmap_future.get(p["team"], []) if x["event"] == gw), None)
-            if g:
-                games.append((p, g))
-        blanks = len(squad) - len(games)
-        if games:
-            games.sort(key=lambda pg: pg[1]["difficulty"])
-            easiest_player = games[0][0]["web_name"]
-            hardest_player = games[-1][0]["web_name"]
-            avg = sum(g["difficulty"] for _, g in games) / len(games)
-        else:
-            easiest_player = hardest_player = None
-            avg = 5
-        label = "Easy week" if avg < 2.5 else "Mixed week" if avg < 3.5 else "Tough week"
+        planned = events_by_gw.get(gw, [])
+        n_planned = len(planned)
+        hit_cost = max(0, n_planned - ft) * 4
+        ft_after = min(5, max(ft - n_planned, 0) + 1)
 
         chip_note = None
-        if gw == best_gw and blanks == 0:
+        if gw == best_gw and gw_avg[gw]["blanks"] == 0:
             if "bboost" not in chip_names_used:
                 chip_note = "Good spot for Bench Boost"
-            elif "3xc" not in chip_names_used:
-                chip_note = "Good spot for Triple Captain"
         if gw == worst_gw:
             if "wildcard" not in chip_names_used:
-                chip_note = "Consider Wildcard here"
-            elif "freehit" not in chip_names_used:
-                chip_note = "Consider Free Hit here"
+                chip_note = "Consider Wildcard here instead of a normal transfer"
 
         plan.append({
-            "gw": gw, "label": label, "avg": round(avg, 1), "blanks": blanks,
-            "captain_tip": easiest_player, "watch_tip": hardest_player, "chip_note": chip_note,
+            "gw": gw, "transfers": planned, "ft_before": ft, "ft_after": ft_after,
+            "hit_cost": hit_cost, "chip_note": chip_note,
         })
+        ft = ft_after
     return plan
 
 
@@ -211,17 +239,35 @@ def main():
     deep_dig_ids = set(squad_ids)
     weak_links = sorted([p for p in squad if p["_quick"] < 3 or p["status"] != "a"],
                          key=lambda p: p["_quick"])[:3]
-    shortlist_by_weak = {}
-    for weak in weak_links:
-        budget = (weak["now_cost"] / 10.0) + bank
+    weak_ids = {p["id"] for p in weak_links}
+
+    # Future dips: squad players who are fine right now but whose fixtures turn hard later —
+    # these become preemptive "sell before GW X" entries in the transfer roadmap.
+    future_dips = []
+    for p in squad:
+        if p["id"] in weak_ids:
+            continue
+        dip_gw = find_future_dip(p, fmap_future, SCORE_LOOKAHEAD)
+        if dip_gw:
+            future_dips.append((p, dip_gw))
+
+    def build_shortlist(target_player):
+        budget = (target_player["now_cost"] / 10.0) + bank
         pool = [p for p in players.values()
-                if p["element_type"] == weak["element_type"]
+                if p["element_type"] == target_player["element_type"]
                 and p["id"] not in squad_ids
                 and p["now_cost"] / 10.0 <= budget
                 and p["status"] == "a"]
         pool.sort(key=lambda p: p["_quick"], reverse=True)
-        shortlist_by_weak[weak["id"]] = pool[:SHORTLIST_PER_WEAK]
-        deep_dig_ids.update(p["id"] for p in pool[:SHORTLIST_PER_WEAK])
+        return pool[:SHORTLIST_PER_WEAK]
+
+    shortlist_by_target = {}
+    for weak in weak_links:
+        shortlist_by_target[weak["id"]] = build_shortlist(weak)
+        deep_dig_ids.update(p["id"] for p in shortlist_by_target[weak["id"]])
+    for p, _ in future_dips:
+        shortlist_by_target[p["id"]] = build_shortlist(p)
+        deep_dig_ids.update(c["id"] for c in shortlist_by_target[p["id"]])
 
     differential_pool = sorted(
         [p for p in players.values() if p["status"] == "a" and float(p["selected_by_percent"]) <= DIFFERENTIAL_MAX_OWNED],
@@ -257,21 +303,24 @@ def main():
     starters_ranked = sorted(starters, key=next_game_score, reverse=True)
     captain, vice = starters_ranked[0], starters_ranked[1]
 
+    def build_alternatives(target_player):
+        candidates = sorted(shortlist_by_target[target_player["id"]], key=lambda p: p["_score"], reverse=True)
+        return [{
+            "name": c["web_name"], "price": c["now_cost"] / 10.0,
+            "score": c["_score"], "ticker": fixture_ticker_html(fmap_display.get(c["team"], [])),
+            "trend": price_trend_text(c),
+            "xgi90": c["_underlying"]["xgi90"] if c["_underlying"] else None,
+        } for c in candidates[:CANDIDATES_PER_WEAK]]
+
+    # "This week" suggestions — shown in the Suggested Transfers section
     suggestions = []
     for weak in weak_links:
-        candidates = sorted(shortlist_by_weak[weak["id"]], key=lambda p: p["_score"], reverse=True)
-        top = candidates[:CANDIDATES_PER_WEAK]
         reason = (weak["_news"] if weak["_news"] else
                   "tough fixture run and shaky underlying numbers" if weak["_score"] < 1
                   else "underlying stats (minutes/xGI) not backing up the price")
         suggestions.append({
             "out": weak["web_name"], "out_reason": reason, "out_score": weak["_score"],
-            "alternatives": [{
-                "name": c["web_name"], "price": c["now_cost"] / 10.0,
-                "score": c["_score"], "ticker": fixture_ticker_html(fmap_display.get(c["team"], [])),
-                "trend": price_trend_text(c),
-                "xgi90": c["_underlying"]["xgi90"] if c["_underlying"] else None,
-            } for c in top],
+            "alternatives": build_alternatives(weak),
         })
 
     gw_range = list(range(next_event, next_event + FUTURE_WINDOW))
@@ -292,15 +341,32 @@ def main():
     differentials = sorted(differential_pool, key=lambda p: p["_score"], reverse=True)[:5]
     chips_used = history_data.get("chips", [])
     chip_names_used = {c["name"] for c in chips_used}
+    chip_events_by_gw = {c["event"]: c["name"] for c in chips_used}
 
-    roadmap = build_gw_plan(squad, gw_range, fmap_future, chip_names_used, best_gw, worst_gw)
+    # Assemble the full transfer roadmap: immediate weak links (now) + future fixture dips (later)
+    transfer_events = []
+    for weak in weak_links:
+        transfer_events.append({
+            "target_gw": next_event, "out": weak["web_name"],
+            "reason": weak["_news"] or "poor current fixtures/form", "alternatives": build_alternatives(weak),
+        })
+    for p, dip_gw in future_dips:
+        transfer_events.append({
+            "target_gw": max(next_event, dip_gw - 1), "out": p["web_name"],
+            "reason": f"fixtures turn tough from GW{dip_gw}", "alternatives": build_alternatives(p),
+        })
+
+    starting_ft = compute_free_transfers(history_data.get("current", []), chip_events_by_gw)
+    transfer_plan = build_transfer_plan(gw_range, transfer_events, gw_avg, best_gw, worst_gw,
+                                         chip_names_used, starting_ft)
 
     render_html(entry, squad, suggestions, chips_used, bank, current_event,
-                captain, vice, gw_avg, best_gw, worst_gw, differentials, roadmap)
+                captain, vice, gw_avg, best_gw, worst_gw, differentials, transfer_plan)
+
 
 
 def render_html(entry, squad, suggestions, chips_used, bank, current_event,
-                 captain, vice, gw_avg, best_gw, worst_gw, differentials, roadmap):
+                 captain, vice, gw_avg, best_gw, worst_gw, differentials, transfer_plan):
     os.makedirs("docs", exist_ok=True)
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
@@ -355,20 +421,29 @@ def render_html(entry, squad, suggestions, chips_used, bank, current_event,
     )
 
     road_html = ""
-    for step in roadmap:
-        bits = [f'<span class="road-tag" style="background:{FDR_COLOR[5] if step["avg"]>=3.5 else FDR_COLOR[3] if step["avg"]>=2.5 else FDR_COLOR[1]}">{step["label"]}</span>']
-        if step["blanks"]:
-            bits.append(f'<span class="dim">{step["blanks"]} blank{"s" if step["blanks"]>1 else ""}</span>')
-        if step["captain_tip"]:
-            bits.append(f'Captaincy lean: <b>{step["captain_tip"]}</b>')
-        if step["watch_tip"] and step["watch_tip"] != step["captain_tip"]:
-            bits.append(f'watch <b>{step["watch_tip"]}</b>\'s fixture')
-        line = " · ".join(bits)
+    for step in transfer_plan:
+        if step["transfers"]:
+            action_lines = ""
+            for ev in step["transfers"]:
+                alt = ev["alternatives"][0] if ev["alternatives"] else None
+                in_text = f'<b>{alt["name"]}</b> (£{alt["price"]}m)' if alt else "no affordable upgrade found"
+                action_lines += (
+                    f'<div class="road-action"><span class="out-name">OUT {ev["out"]}</span> '
+                    f'<span class="arrow">&#8594;</span> IN {in_text}<br>'
+                    f'<span class="dim">{ev["reason"]}</span></div>'
+                )
+            hit_line = (f'<div class="dim">Costs a {step["hit_cost"]}-point hit ({len(step["transfers"])} '
+                        f'transfer{"s" if len(step["transfers"])>1 else ""}, {step["ft_before"]} free banked)</div>'
+                        if step["hit_cost"] else
+                        f'<div class="dim">Uses free transfer(s) — {step["ft_before"]} banked going in</div>')
+            body = action_lines + hit_line
+        else:
+            body = f'<div class="dim">Hold — bank a free transfer ({step["ft_after"]} will be banked)</div>'
         chip_html = f'<div class="chip-flag">{step["chip_note"]}</div>' if step["chip_note"] else ""
         road_html += (
             f'<div class="road-step"><div class="road-node">{step["gw"]}</div>'
             f'<div class="road-content"><div class="gw-label">Gameweek {step["gw"]}</div>'
-            f'<div class="dim">{line}</div>{chip_html}</div></div>'
+            f'{body}{chip_html}</div></div>'
         )
 
     team_name = entry.get("name", "My FPL Squad")
@@ -450,6 +525,7 @@ th {{ color: var(--dim); font-weight: 500; font-size: 12px; }}
 .road-content {{ background: var(--turf); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; }}
 .gw-label {{ font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 14px; margin-bottom: 4px; }}
 .road-tag {{ display: inline-block; color: var(--ink); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-right: 6px; }}
+.road-action {{ font-size: 14px; margin-bottom: 6px; }}
 .chip-flag {{ display: inline-block; margin-top: 8px; background: var(--floodlight); color: var(--ink);
               font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 5px; }}
 </style></head><body>
@@ -466,7 +542,7 @@ th {{ color: var(--dim); font-weight: 500; font-size: 12px; }}
   </div>
 </div>
 
-<div class="divider"><span>Season roadmap</span></div>
+<div class="divider"><span>Transfer roadmap</span></div>
 <div class="roadmap">
 {road_html}
 </div>
