@@ -18,7 +18,7 @@ import requests
 TEAM_ID = os.environ.get("FPL_TEAM_ID", "6150125")
 SCORE_LOOKAHEAD = 3
 DISPLAY_LOOKAHEAD = 5
-FUTURE_WINDOW = 6
+FUTURE_WINDOW = 8
 DIFFERENTIAL_MAX_OWNED = 10.0
 RECENT_GAMES = 4          # matches used for the underlying-performance dig
 CANDIDATES_PER_WEAK = 4   # how many alternatives to show per weak link
@@ -141,6 +141,45 @@ def news_text(p):
     return ""
 
 
+def build_gw_plan(squad, gw_range, fmap_future, chip_names_used, best_gw, worst_gw):
+    """A week-by-week narrative: fixture read, captaincy lean, rotation watch, chip callouts."""
+    plan = []
+    for gw in gw_range:
+        games = []
+        for p in squad:
+            g = next((x for x in fmap_future.get(p["team"], []) if x["event"] == gw), None)
+            if g:
+                games.append((p, g))
+        blanks = len(squad) - len(games)
+        if games:
+            games.sort(key=lambda pg: pg[1]["difficulty"])
+            easiest_player = games[0][0]["web_name"]
+            hardest_player = games[-1][0]["web_name"]
+            avg = sum(g["difficulty"] for _, g in games) / len(games)
+        else:
+            easiest_player = hardest_player = None
+            avg = 5
+        label = "Easy week" if avg < 2.5 else "Mixed week" if avg < 3.5 else "Tough week"
+
+        chip_note = None
+        if gw == best_gw and blanks == 0:
+            if "bboost" not in chip_names_used:
+                chip_note = "Good spot for Bench Boost"
+            elif "3xc" not in chip_names_used:
+                chip_note = "Good spot for Triple Captain"
+        if gw == worst_gw:
+            if "wildcard" not in chip_names_used:
+                chip_note = "Consider Wildcard here"
+            elif "freehit" not in chip_names_used:
+                chip_note = "Consider Free Hit here"
+
+        plan.append({
+            "gw": gw, "label": label, "avg": round(avg, 1), "blanks": blanks,
+            "captain_tip": easiest_player, "watch_tip": hardest_player, "chip_note": chip_note,
+        })
+    return plan
+
+
 def main():
     bootstrap = fetch_json(f"{BASE}/bootstrap-static/")
     fixtures = fetch_json(f"{BASE}/fixtures/")
@@ -252,13 +291,16 @@ def main():
 
     differentials = sorted(differential_pool, key=lambda p: p["_score"], reverse=True)[:5]
     chips_used = history_data.get("chips", [])
+    chip_names_used = {c["name"] for c in chips_used}
+
+    roadmap = build_gw_plan(squad, gw_range, fmap_future, chip_names_used, best_gw, worst_gw)
 
     render_html(entry, squad, suggestions, chips_used, bank, current_event,
-                captain, vice, gw_avg, best_gw, worst_gw, differentials)
+                captain, vice, gw_avg, best_gw, worst_gw, differentials, roadmap)
 
 
 def render_html(entry, squad, suggestions, chips_used, bank, current_event,
-                 captain, vice, gw_avg, best_gw, worst_gw, differentials):
+                 captain, vice, gw_avg, best_gw, worst_gw, differentials, roadmap):
     os.makedirs("docs", exist_ok=True)
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
@@ -311,6 +353,23 @@ def render_html(entry, squad, suggestions, chips_used, bank, current_event,
         f'</div></div><span class="dim">{"blanks: "+str(d["blanks"]) if d["blanks"] else round(d["avg"],1)}</span></div>'
         for gw, d in gw_avg.items()
     )
+
+    road_html = ""
+    for step in roadmap:
+        bits = [f'<span class="road-tag" style="background:{FDR_COLOR[5] if step["avg"]>=3.5 else FDR_COLOR[3] if step["avg"]>=2.5 else FDR_COLOR[1]}">{step["label"]}</span>']
+        if step["blanks"]:
+            bits.append(f'<span class="dim">{step["blanks"]} blank{"s" if step["blanks"]>1 else ""}</span>')
+        if step["captain_tip"]:
+            bits.append(f'Captaincy lean: <b>{step["captain_tip"]}</b>')
+        if step["watch_tip"] and step["watch_tip"] != step["captain_tip"]:
+            bits.append(f'watch <b>{step["watch_tip"]}</b>\'s fixture')
+        line = " · ".join(bits)
+        chip_html = f'<div class="chip-flag">{step["chip_note"]}</div>' if step["chip_note"] else ""
+        road_html += (
+            f'<div class="road-step"><div class="road-node">{step["gw"]}</div>'
+            f'<div class="road-content"><div class="gw-label">Gameweek {step["gw"]}</div>'
+            f'<div class="dim">{line}</div>{chip_html}</div></div>'
+        )
 
     team_name = entry.get("name", "My FPL Squad")
 
@@ -381,6 +440,18 @@ th {{ color: var(--dim); font-weight: 500; font-size: 12px; }}
 
 .chip-row, .diff-row {{ padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }}
 .chip-name {{ font-weight: 600; }}
+
+.roadmap {{ position: relative; padding-left: 30px; }}
+.roadmap::before {{ content: ""; position: absolute; left: 13px; top: 4px; bottom: 4px; width: 2px; background: var(--line); }}
+.road-step {{ position: relative; margin-bottom: 14px; }}
+.road-node {{ position: absolute; left: -30px; top: 0; width: 26px; height: 26px; border-radius: 50%;
+              background: var(--turf); border: 2px solid var(--floodlight); display: flex; align-items: center;
+              justify-content: center; font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700; color: var(--floodlight); }}
+.road-content {{ background: var(--turf); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; }}
+.gw-label {{ font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 14px; margin-bottom: 4px; }}
+.road-tag {{ display: inline-block; color: var(--ink); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-right: 6px; }}
+.chip-flag {{ display: inline-block; margin-top: 8px; background: var(--floodlight); color: var(--ink);
+              font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 5px; }}
 </style></head><body>
 
 <div class="hero">
@@ -393,6 +464,11 @@ th {{ color: var(--dim); font-weight: 500; font-size: 12px; }}
     <div class="seg"><div class="val">£{entry.get('last_deadline_value',0)/10:.1f}m</div><div class="lbl">Team value</div></div>
     <div class="seg"><div class="val">£{bank}m</div><div class="lbl">In the bank</div></div>
   </div>
+</div>
+
+<div class="divider"><span>Season roadmap</span></div>
+<div class="roadmap">
+{road_html}
 </div>
 
 <div class="divider"><span>Captaincy</span></div>
@@ -408,7 +484,7 @@ th {{ color: var(--dim); font-weight: 500; font-size: 12px; }}
 <table><tr><th>Player</th><th>Pos</th><th>Price</th><th>Form</th><th>Underlying (last {RECENT_GAMES})</th><th>Next {DISPLAY_LOOKAHEAD}</th><th>Score</th></tr>
 {rows}</table>
 
-<div class="divider"><span>Fixture outlook</span></div>
+<div class="divider"><span>Fixture difficulty at a glance</span></div>
 {gw_bars}
 <div class="callout">
 Best window: GW{best_gw} — squad's easiest average fixtures. Good spot to consider Bench Boost or Triple Captain.<br>
